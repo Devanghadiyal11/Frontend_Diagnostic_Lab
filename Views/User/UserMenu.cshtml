@@ -1,0 +1,546 @@
+﻿@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+    <div class="alert alert-danger">
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+<!-- Rest of your view -->
+@{
+    ViewData["Title"] = "User Management | Diagnostic Lab";
+}
+
+<style>
+    :root {
+        --primary-color: #1e3a8a;
+        --primary-light: #3b82f6;
+        --secondary-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --info-color: #06b6d4;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+        .user-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .user-table tbody tr {
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+            .user-table tbody tr:hover {
+                background-color: #f8f9fa;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+        .user-table tbody td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+
+    .user-name {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 50px;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--secondary-color);
+    }
+
+    .badge-inactive {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .role-badge {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--primary-light);
+    }
+
+    .action-btn {
+        margin: 0 3px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+
+    .btn-delete {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+        .btn-delete:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+    /* Password field styling */
+    .password-field {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .password-text {
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+
+    .toggle-password {
+        margin-left: 5px;
+        background: none;
+        border: none;
+        color: var(--primary-light);
+        cursor: pointer;
+    }
+
+    /* Search and Filter Section */
+    .user-search-section {
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+    }
+
+    .search-input-group {
+        position: relative;
+    }
+
+    .search-input {
+        padding-left: 40px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        height: 45px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    .filter-btn {
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
+        border-radius: 8px;
+        padding: 8px 15px;
+        margin-left: 10px;
+    }
+
+        .filter-btn:hover {
+            background-color: #f9fafb;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+    /* Delete Confirmation Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .modal-content {
+        background-color: white;
+        padding: 25px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--danger-color);
+    }
+
+    .modal-body {
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Responsive Table */
+    @@media (max-width: 768px) {
+        .user-table thead {
+            display: none;
+        }
+
+        .user-table tbody tr {
+            display: block;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+            .user-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                margin-right: 15px;
+                text-align: left;
+            }
+
+        .user-name {
+            justify-content: space-between;
+            text-align: left;
+        }
+
+        .password-field {
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            margin: 0 2px;
+        }
+    }
+</style>
+
+<!-- Main Content -->
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--primary-color);">
+            <i class="fas fa-users me-2"></i>User Management
+        </h2>
+        <div>
+            <a class="btn btn-primary" asp-controller="User" asp-action="AddEdit">
+                <i class="fas fa-plus me-2"></i>Add New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="user-search-section">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="search-input-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control search-input" placeholder="Search users by email, ID or role...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex align-items-center justify-content-md-end">
+                    <span class="me-2 text-muted">Filter:</span>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="inactive">Inactive</button>
+                    <button class="filter-btn" data-filter="doctor">Doctor</button>
+                    <button class="filter-btn" data-filter="receptionist">Staff</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+        <div class="alert alert-danger">
+            @ViewBag.SuccessMessage
+        </div>
+    <!-- User Table -->
+    <div class="table-responsive">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Mobile</th>  
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td data-label="User">
+                            <div class="user-name">
+                                <img src="https://randomuser.me/api/portraits/men/@(user.UserId % 100).jpg" alt="User" class="user-avatar">
+                                <div>
+                                    <div class="fw-bold">@user.Name</div>  <!-- Changed from "Role User" to actual Name -->
+                                    <small class="text-muted">#USR-@user.UserId</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Email">@user.Email</td>
+                        <td data-label="Mobile">@(user.MobileNo ?? "N/A")</td>
+                        <td data-label="Password">
+                            <div class="password-field">
+                                <span class="password-text" data-password="@user.Password">@(new string('•', user.Password?.Length ?? 0))</span>
+                                <button class="toggle-password" onclick="togglePassword(this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td data-label="Role">
+                            <span class="status-badge role-badge">@user.Role</span>
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge @(user.IsActive ? "badge-active" : "badge-inactive")">
+                                @(user.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td data-label="Actions">
+                            <!-- Action buttons remain exactly the same -->
+                            <button class="btn btn-sm btn-outline-primary action-btn">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a class="btn btn-sm btn-outline-secondary action-btn" asp-controller="User" asp-action="AddEdit" asp-route-UserId="@user.UserId">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a class="btn btn-sm btn-delete action-btn delete-user" asp-action="Delete" asp-controller="User" asp-route-UserId="@user.UserId"
+                                    data-user-id="@user.UserId"
+                                    data-user-name="@user.Name">
+                                <!-- Changed to use Name instead of Role -->
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="User pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+            <button type="button" class="btn-close" id="closeModal"></button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete user <strong id="userNameToDelete"></strong>? This action cannot be undone.</p>
+            <p class="text-danger"><small>All related records will be permanently removed.</small></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" id="cancelDelete">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDelete">Delete User</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Password toggle functionality
+        function togglePassword(button) {
+            const passwordField = button.previousElementSibling;
+            const isHidden = passwordField.textContent === passwordField.getAttribute('data-password').replace(/./g, '•');
+
+            if (isHidden) {
+                passwordField.textContent = passwordField.getAttribute('data-password');
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                passwordField.textContent = passwordField.getAttribute('data-password').replace(/./g, '•');
+                button.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+             // Enhanced Filter button functionality
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                document.querySelectorAll('.user-table tbody tr').forEach(row => {
+                    const status = row.querySelector('.status-badge:not(.role-badge)').textContent.trim().toLowerCase();
+                    const role = row.querySelector('.role-badge').textContent.trim().toLowerCase();
+
+                    let shouldShow = false;
+
+                    switch(filter) {
+                        case 'all':
+                            shouldShow = true;
+                            break;
+                        case 'active':
+                            shouldShow = status === 'active';
+                            break;
+                        case 'inactive':
+                            shouldShow = status === 'inactive';
+                            break;
+                        case 'doctor':
+                            shouldShow = role === 'doctor';
+                            break;
+                        case 'receptionist':
+                            shouldShow = role === 'receptionist';
+                            break;
+                        default:
+                            shouldShow = true;
+                    }
+
+                    row.style.display = shouldShow ? '' : 'none';
+                });
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            document.querySelectorAll('.user-table tbody tr').forEach(row => {
+                const userName = row.querySelector('.fw-bold').textContent.toLowerCase();
+                const userId = row.querySelector('.text-muted').textContent.toLowerCase();
+                const userEmail = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const userRole = row.querySelector('.role-badge').textContent.toLowerCase();
+
+                if (userName.includes(searchTerm) ||
+                    userId.includes(searchTerm) ||
+                    userEmail.includes(searchTerm) ||
+                    userRole.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+
+
+        // Close modal when X or Cancel is clicked
+        [closeModal, cancelDelete].forEach(button => {
+            button.addEventListener('click', () => {
+                deleteModal.classList.remove('active');
+                currentUserIdToDelete = null;
+            });
+        });
+
+
+        // Close modal when clicking outside the modal content
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('active');
+                currentUserIdToDelete = null;
+            }
+        });
+                // Password toggle functionality
+        function togglePassword(button) {
+            const passwordField = button.previousElementSibling;
+            const isHidden = passwordField.textContent === passwordField.getAttribute('data-password').replace(/./g, '•');
+
+            if (isHidden) {
+                passwordField.textContent = passwordField.getAttribute('data-password');
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                passwordField.textContent = passwordField.getAttribute('data-password').replace(/./g, '•');
+                button.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+    </script>
+} 

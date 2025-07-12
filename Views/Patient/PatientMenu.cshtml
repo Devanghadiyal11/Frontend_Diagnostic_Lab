@@ -1,0 +1,238 @@
+﻿@model IEnumerable<Diagnostic_Lab.Models.PatientModel>
+@{
+    ViewData["Title"] = "Patient Management | Diagnostic Lab";
+}
+
+<style>
+    /* Your existing CSS remains unchanged */
+    :root {
+        --primary-color: #1e3a8a;
+        /* ... rest of your CSS ... */
+    }
+</style>
+
+<!-- Main Content -->
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--primary-color);">
+            <i class="fas fa-user-injured me-2"></i>Patient Management
+        </h2>
+        <div>
+            <a asp-action="AddEdit" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New Patient
+            </a>
+        </div>
+    </div>
+
+    <!-- Display Error Message if any -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Display Success Message if any -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Search and Filter Section -->
+    <div class="patient-search-section">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="search-input-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="form-control search-input" placeholder="Search patients by name, ID or contact...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex align-items-center justify-content-md-end">
+                    <span class="me-2 text-muted">Filter:</span>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="inactive">Inactive</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Table -->
+    <div class="table-responsive">
+        <table class="patient-table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Contact</th>
+                    <th>Age/DOB</th>
+                    <th>Gender</th>
+                    <th>City</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var patient in Model)
+                {
+                    <tr data-status="@(patient.IsActive ? "active" : "inactive")">
+                        <td data-label="Patient">
+                            <div class="patient-name">
+                                <img src="https://randomuser.me/api/portraits/@(patient.Gender.ToLower() == "male" ? "men" : "women")/@(patient.PatientId % 100).jpg" alt="Patient" class="patient-avatar">
+                                <div>
+                                    <div class="fw-bold">@(patient.User?.Name ?? "N/A")</div>
+                                    <small class="text-muted">#PAT-@patient.PatientId</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Contact">@(patient.User?.MobileNo ?? "N/A")</td>
+                        <td data-label="Age/DOB">@patient.Age (@patient.Dob.ToString("MM/dd/yyyy"))</td>
+                        <td data-label="Gender">@patient.Gender</td>
+                        <td data-label="City">@patient.City</td>
+                        <td data-label="Address">@(patient.Address ?? "N/A")</td>
+                        <td data-label="Status">
+                            <span class="status-badge @(patient.IsActive ? "badge-active" : "badge-inactive")">
+                                @(patient.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td data-label="Actions">
+                            <a asp-action="Details" asp-route-id="@patient.PatientId" class="btn btn-sm btn-outline-primary action-btn">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="AddEdit" asp-route-id="@patient.PatientId" class="btn btn-sm btn-outline-secondary action-btn">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-sm btn-delete action-btn delete-patient"
+                                    data-patient-id="@patient.PatientId"
+                                    data-patient-name="@(patient.User?.FullName ?? "N/A")">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Patient pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+            <button type="button" class="btn-close" id="closeModal"></button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete patient <strong id="patientNameToDelete"></strong>? This action cannot be undone.</p>
+            <p class="text-danger"><small>All related records will be permanently removed.</small></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" id="cancelDelete">Cancel</button>
+            <a href="#" class="btn btn-danger" id="confirmDelete">Delete Patient</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Filter button functionality
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                document.querySelectorAll('.patient-table tbody tr').forEach(row => {
+                    const status = row.getAttribute('data-status');
+
+                    if (filter === 'all' || status === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            document.querySelectorAll('.patient-table tbody tr').forEach(row => {
+                const patientName = row.querySelector('.fw-bold').textContent.toLowerCase();
+                const patientId = row.querySelector('.text-muted').textContent.toLowerCase();
+                const patientPhone = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const patientCity = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                const patientAddress = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+
+                if (patientName.includes(searchTerm) ||
+                    patientId.includes(searchTerm) ||
+                    patientPhone.includes(searchTerm) ||
+                    patientCity.includes(searchTerm) ||
+                    patientAddress.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Delete Patient Functionality
+        const deleteModal = document.getElementById('deleteModal');
+        const patientNameToDelete = document.getElementById('patientNameToDelete');
+        const closeModal = document.getElementById('closeModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+
+        // Show modal when delete button is clicked
+        document.querySelectorAll('.delete-patient').forEach(button => {
+            button.addEventListener('click', function() {
+                const patientId = this.getAttribute('data-patient-id');
+                const patientName = this.getAttribute('data-patient-name');
+                patientNameToDelete.textContent = patientName;
+                confirmDelete.setAttribute('href', `/Patient/Delete/${patientId}`);
+                deleteModal.classList.add('active');
+            });
+        });
+
+        // Close modal when X or Cancel is clicked
+        [closeModal, cancelDelete].forEach(button => {
+            button.addEventListener('click', () => {
+                deleteModal.classList.remove('active');
+            });
+        });
+
+        // Close modal when clicking outside the modal content
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('active');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,246 @@
+﻿<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Total Patients</p>
+                    <h3 class="mb-1">1,248</h3>
+                    <p class="text-success small mb-0">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </p>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="fas fa-user-injured"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Tests Today</p>
+                    <h3 class="mb-1">86</h3>
+                    <p class="text-danger small mb-0">
+                        <i class="fas fa-arrow-down"></i> 5% from yesterday
+                    </p>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-vial"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Pending Reports</p>
+                    <h3 class="mb-1">24</h3>
+                    <p class="text-success small mb-0">
+                        <i class="fas fa-arrow-up"></i> 8% from last week
+                    </p>
+                </div>
+                <div class="stat-icon bg-purple bg-opacity-10 text-purple">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1">Revenue</p>
+                    <h3 class="mb-1">$12,480</h3>
+                    <p class="text-success small mb-0">
+                        <i class="fas fa-arrow-up"></i> 15% from last month
+                    </p>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    <!-- Tests Chart -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Tests Performed</h5>
+                    <select class="form-select form-select-sm w-auto">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="testsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Types Chart -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Test Types Distribution</h5>
+                    <select class="form-select form-select-sm w-auto">
+                        <option>This Month</option>
+                        <option>Last Month</option>
+                        <option>Last Quarter</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="testTypesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Patients and Quick Actions -->
+<div class="row g-3">
+    <!-- Recent Patients -->
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Recent Patients</h5>
+                    <a href="#" class="text-primary small">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table recent-patients-table">
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Name</th>
+                                <th>Test</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#PAT-00124</td>
+                                <td>John Smith</td>
+                                <td>CBC, Lipid Profile</td>
+                                <td>
+                                    <span class="status-badge bg-success bg-opacity-10 text-success">Completed</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#PAT-00123</td>
+                                <td>Sarah Johnson</td>
+                                <td>Thyroid Panel</td>
+                                <td>
+                                    <span class="status-badge bg-warning bg-opacity-10 text-warning">In Progress</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#PAT-00122</td>
+                                <td>Michael Brown</td>
+                                <td>Liver Function Test</td>
+                                <td>
+                                    <span class="status-badge bg-danger bg-opacity-10 text-danger">Pending</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>   
+                            </tr>
+                            <tr>
+                                <td>#PAT-00121</td>
+                                <td>Emily Davis</td>
+                                <td>Blood Sugar Test</td>
+                                <td>
+                                    <span class="status-badge bg-success bg-opacity-10 text-success">Completed</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Quick Actions</h5>
+                <div class="d-grid gap-2 mb-4">
+                    <button class="quick-action-btn bg-primary bg-opacity-10 text-primary">
+                        <span>Add New Patient</span>
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="quick-action-btn bg-success bg-opacity-10 text-success">
+                        <span>Schedule Test</span>
+                        <i class="fas fa-calendar-plus"></i>
+                    </button>
+                    <button class="quick-action-btn bg-purple bg-opacity-10 text-purple">
+                        <span>Generate Report</span>
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button class="quick-action-btn bg-warning bg-opacity-10 text-warning">
+                        <span>Inventory Check</span>
+                        <i class="fas fa-boxes"></i>
+                    </button>
+                    <button class="quick-action-btn bg-danger bg-opacity-10 text-danger">
+                        <span>Emergency Alert</span>
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </button>
+                </div>
+
+                <h5 class="card-title mb-3">Upcoming Appointments</h5>
+                <div class="d-grid gap-2">
+                    <div class="d-flex align-items-center p-2 border rounded">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3" style="width: 36px; height: 36px;">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-medium">Dr. Smith Consultation</p>
+                            <p class="mb-0 small text-muted">Today, 2:30 PM</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center p-2 border rounded">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success me-3" style="width: 36px; height: 36px;">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-medium">Blood Collection</p>
+                            <p class="mb-0 small text-muted">Tomorrow, 9:00 AM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
